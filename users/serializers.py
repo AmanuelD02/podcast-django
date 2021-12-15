@@ -1,9 +1,20 @@
-from rest_framework import serializers
-from .models import User, Subscribe
+from rest_framework import fields, serializers
+from .models import User
 
-class UserSerializer(serializers.Serializer):
-    pass
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','email', 'password','first_name','last_name', 'profile_pic','username']
+        extra_kwargs = {'password': {'write_only': True}}
+        read_only_fields = ['id']
+    
+    def create(self, validated_data):
+         user = User(email= validated_data['email'], first_name=validated_data['first_name'], last_name = validated_data['last_name'], profile_pic= validated_data['profile_pic'], username = validated_data['username'] )
+         user.set_password(validated_data['password'])
+         user.save()
+         return user
 
 
-class SubscribeSerializer(serializers.Serializer):
-    pass
+class LoginSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True, write_only=True)
+    email = serializers.EmailField(required=True)

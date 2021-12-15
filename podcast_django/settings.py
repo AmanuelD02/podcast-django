@@ -1,11 +1,14 @@
 
 from pathlib import Path
 import os
+from datetime import timedelta
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 
+from django.conf import settings
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-or%b1!3g2*_e1+5lw&=eej3lux5*52al$1gl-)l)8t@+c(l5b5'
@@ -25,6 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
     'users',
     'channels'
 
@@ -39,6 +44,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_CREDENTIALS = True # to accept cookies via ajax request
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:9000' # the domain for front-end app(you can add more than 1) 
+]
+
+REST_FRAMEWORK  = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated', # make all endpoints private
+    )
+    }
 
 ROOT_URLCONF = 'podcast_django.urls'
 
@@ -118,3 +137,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    'TOKEN_TYPE_CLAIM': 'access'
+}
