@@ -31,6 +31,17 @@ class RegisterView(APIView):
 
         return Response({"data":serializer.data, "token":token})
 
+class EditProfile(APIView):
+    def put(self, request,id):
+        user = User.objects.get(id=id)
+
+        data = request.data.dict()
+
+        serializer = UserSerializer(user, data = data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
 
 
 
