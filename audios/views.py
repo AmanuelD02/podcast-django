@@ -10,7 +10,6 @@ from rest_framework.permissions import AllowAny
 
 # Create your views here.
 class PostPodcastView(APIView):
-    permission_classes = [AllowAny, ]
     def post(self, request,user_id,channel_id):
         data = request.data.dict()
         data['user_id'] = user_id
