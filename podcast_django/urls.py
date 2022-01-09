@@ -29,5 +29,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/user/',include('users.urls')),
     path('api/v1/channel/',include('channels.urls')),
+    path('api/v1/users/',include('audios.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
