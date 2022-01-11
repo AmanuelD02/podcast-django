@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import RatingView
+from .views import PostRatingView
 
 urlpatterns = [
-    path('<int:channel_id>/rating/',RatingView.as_view())
+    path('user/channel/rating/',PostRatingView.as_view())
 ]
