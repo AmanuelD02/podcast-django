@@ -22,15 +22,15 @@ class PostPodcastView(APIView):
 
         return Response({"data":serializer.data})
 
-class  PodcastView(APIView):
+class PodcastView(APIView):
     def get(self, request, user_id,channel_id,id):
-        audio = Audio.objects.get(id=id)
+        audio = get_object_or_404(Audio, pk=id)
         serializer = AudioSerializer(audio)
         
         return Response(serializer.data) 
     
     def put(self, request, user_id,channel_id,id):
-        audio = Audio.objects.get(id=id)
+        audio = get_object_or_404(Audio, pk=id)
         data = request.data.dict()
         data['user_id'] = user_id
         data['channel_id'] = channel_id
@@ -42,7 +42,7 @@ class  PodcastView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, user_id,channel_id,id):
-        audio = Audio.objects.get(id=id)
+        audio = get_object_or_404(Audio, pk=id)
 
         audio.delete()
         return Response("deleted")
