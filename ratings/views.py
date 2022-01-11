@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from ratings.models import Rating
-from rest_framework import serializers
+from rest_framework import status
 from rest_framework.views import APIView
+
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
@@ -15,7 +16,7 @@ class PostRatingView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response({"data":serializer.data})
+        return Response(serializer.data)
 
 class RatingView(APIView):
     def get(self, request, id):
@@ -38,4 +39,4 @@ class RatingView(APIView):
         rating = get_object_or_404(Rating, pk=id)
 
         rating.delete()
-        return Response("deleted")
+        return Response(status=status.HTTP_204_NO_CONTENT)

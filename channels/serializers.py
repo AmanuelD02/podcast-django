@@ -5,8 +5,8 @@ from .models import Channel, Subscribe
 class ChannelSerializer(serializers.ModelSerializer):
     class Meta:
         model= Channel
-        fields = ['id', 'user_id', 'channel_name', 'description', 'profile_pic']
-        read_only_fields = ['id']
+        fields = ['id', 'user_id', 'channel_name', 'description', 'profile_pic','rate']
+        read_only_fields = ['id', 'rate']
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

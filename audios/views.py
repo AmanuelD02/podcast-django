@@ -20,7 +20,7 @@ class PostPodcastView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response({"data":serializer.data})
+        return Response(serializer.data)
 
 class PodcastView(APIView):
     def get(self, request, user_id,channel_id,id):
