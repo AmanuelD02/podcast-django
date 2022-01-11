@@ -39,3 +39,10 @@ class RatingView(APIView):
 
         rating.delete()
         return Response("deleted")
+
+class RatingsView(APIView):
+    def get(self, request, channel_id):
+        audios = get_object_or_404(Rating, channel_id=channel_id)
+        serializer = RatingSerializer(audios, many=True)
+
+        return Response(serializer.data)
