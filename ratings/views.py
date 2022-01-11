@@ -40,3 +40,11 @@ class RatingView(APIView):
 
         rating.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
+class RatingsView(APIView):
+    def get(self, request, channel_id):
+        ratings = Rating.objects.filter(channel_id=channel_id)
+        serializer = RatingSerializer(ratings, many=True)
+
+        return Response(serializer.data)
