@@ -29,6 +29,16 @@ class ChannelViewSet(ModelViewSet):
         result = Channel.objects.filter(user_id=owner)
         serializer = ChannelSerializer(result, many=True)
         return Response(serializer.data)
+    
+
+    @action(detail= False, methods=['get'])
+    def top_rated(self, request):
+        channels = Channel.objects.all().order_by('rating')[:10]
+
+        serializer = ChannelSerializer(channels, many=True)
+
+        return Response(serializer.data)
+        
 
 
 
@@ -40,4 +50,9 @@ class SubscriptionViewSet(ModelViewSet):
         return Subscribe.objects.filter(user_id=self.request.user)
     def get_serializer_context(self):
         return {'request':self.request}
+        
 
+
+
+
+        

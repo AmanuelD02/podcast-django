@@ -9,4 +9,5 @@ router = routers.DefaultRouter()
 router.register('subscribe',views.SubscriptionViewSet,basename="subscribe")
 router.register('',views.ChannelViewSet)
 
-urlpatterns =router.urls
+
+urlpatterns = router.urls
