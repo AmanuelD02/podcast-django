@@ -42,7 +42,7 @@ class RatingView(APIView):
 
 class RatingsView(APIView):
     def get(self, request, channel_id):
-        audios = get_object_or_404(Rating, channel_id=channel_id)
-        serializer = RatingSerializer(audios, many=True)
+        ratings = Rating.objects.filter(channel_id=channel_id)
+        serializer = RatingSerializer(ratings, many=True)
 
         return Response(serializer.data)
