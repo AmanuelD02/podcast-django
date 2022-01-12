@@ -9,10 +9,14 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
     
     def create(self, validated_data):
-         user = User(email= validated_data['email'], first_name=validated_data['first_name'], last_name = validated_data['last_name'], profile_pic= validated_data['profile_pic'], username = validated_data['username'] )
-         user.set_password(validated_data['password'])
-         user.save()
-         return user
+        if validated_data.get('profile_pic'):
+            user = User(email= validated_data['email'], first_name=validated_data['first_name'], last_name = validated_data['last_name'], profile_pic= validated_data['profile_pic'], username = validated_data['username'] )
+        else:
+            user = User(email= validated_data['email'], first_name=validated_data['first_name'], last_name = validated_data['last_name'], username = validated_data['username'] )
+
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
