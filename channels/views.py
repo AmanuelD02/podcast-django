@@ -38,7 +38,7 @@ class ChannelViewSet(ModelViewSet):
         serializer = ChannelSerializer(channels, many=True)
 
         return Response(serializer.data)
-        
+    
 
 
 
