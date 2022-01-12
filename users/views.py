@@ -15,7 +15,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticate
 class RegisterView(APIView):
     permission_classes = [AllowAny, ]
     def post(self,request):
-        data = request.data.dict()
+        data = request.data
         email = data['email']
 
         serializer = UserSerializer(data = data)
