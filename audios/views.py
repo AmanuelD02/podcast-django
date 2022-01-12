@@ -73,5 +73,11 @@ class DownloadPodcastView(APIView):
         # Return the response value
         return response
 
+class PodcastsView(APIView):
+    def get(self, request,channel_id):
+        audios = Audio.objects(channel_id=channel_id)
+        serializer = AudioSerializer(audios, many=True)
+
+        return Response(serializer.data)
 
 
