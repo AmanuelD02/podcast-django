@@ -17,11 +17,8 @@ from rest_framework.permissions import AllowAny, OperandHolder
 
 # Create your views here.
 class PostPodcastView(APIView):
-    def post(self, request,user_id,channel_id):
-        data = request.data.dict()
-        data['user_id'] = user_id
-        data['channel_id'] = channel_id
-
+    def post(self, request):
+        data = request.data
         serializer = AudioSerializer(data = data)
 
         serializer.is_valid(raise_exception=True)
@@ -30,17 +27,15 @@ class PostPodcastView(APIView):
         return Response(serializer.data)
 
 class PodcastView(APIView):
-    def get(self, request, user_id,channel_id,id):
+    def get(self, request,id):
         audio = get_object_or_404(Audio, pk=id)
         serializer = AudioSerializer(audio)
         
         return Response(serializer.data) 
     
-    def put(self, request, user_id,channel_id,id):
+    def put(self, request,id):
         audio = get_object_or_404(Audio, pk=id)
-        data = request.data.dict()
-        data['user_id'] = user_id
-        data['channel_id'] = channel_id
+        data = request.data
 
         serializer = AudioSerializer(audio, data=data)
         serializer.is_valid(raise_exception=True)

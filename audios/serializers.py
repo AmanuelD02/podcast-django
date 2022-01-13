@@ -1,14 +1,26 @@
+import re
 from rest_framework import fields, serializers
-from .models import Audio
 
+from channels.models import Channel
+from .models import Audio
+import random
 
 class AudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audio
         fields = ['id', 'user_id', 'channel_id',
-                  'title', 'Description', 'path', 'poster']
+                  'title', 'Description', 'path', 'poster','name']
         read_only_fields = ['id']
 
-        # def create(self, validated_data):
-        #     audio = Audio(user_id=validated_data['user_id'], channel_id=validated_data['channel_id'], title=validated_data['title'],
-        #                   decripttion=validated_data['description'], path=validated_data['path'], poster=validated_data['poster'])
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['numberOfListeners'] =  random.randint(0,10)
+        representation['url'] = representation['path']
+        representation['description'] = representation['Description']
+
+        # print(instance.channel_id.id)
+        channelId = instance.channel_id.id
+        channel = Channel.objects.filter(id=channelId).first()
+        # print(channel)
+        representation['channelName'] = channel.channel_name
+        return representation
