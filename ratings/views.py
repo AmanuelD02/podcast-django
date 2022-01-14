@@ -19,14 +19,14 @@ class PostRatingView(APIView):
         return Response(serializer.data)
 
 class RatingView(APIView):
-    def get(self, request, id):
-        rating = get_object_or_404(Rating, pk=id)
+    def get(self, request, channel_id, user_id):
+        rating = Rating.objects.filter(channel_id=channel_id).filter(user_id=user_id).first()
         serializer = RatingSerializer(rating)
 
         return Response(serializer.data)
     
-    def put(self, request, id):
-        rating = get_object_or_404(Rating, pk=id)
+    def put(self, request, channel_id, user_id):
+        rating = Rating.objects.filter(channel_id=channel_id).filter(user_id=user_id).first()
         data = request.data.dict()
 
         serializer = RatingSerializer(rating, data = data)
@@ -35,8 +35,8 @@ class RatingView(APIView):
 
         return Response(serializer.data)
 
-    def delete(self, request, id):
-        rating = get_object_or_404(Rating, pk=id)
+    def delete(self, request, channel_id, user_id):
+        rating = Rating.objects.filter(channel_id=channel_id).filter(user_id=user_id).first()
 
         rating.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -48,3 +48,12 @@ class RatingsView(APIView):
         serializer = RatingSerializer(ratings, many=True)
 
         return Response(serializer.data)
+
+class IsRatedView(APIView):
+    def get(self, request,channel_id,user_id):
+        isRated = Rating.objects.filter(channel_id=channel_id).filter(user_id=user_id).first()
+         
+        if isRated:
+            return Response(True)
+        
+        return Response(False)

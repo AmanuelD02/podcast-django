@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import mimetypes
+from random import Random
 from django.http.response import HttpResponse
 
 
@@ -14,6 +15,19 @@ from rest_framework.response import Response
 
 from audios.serializers import AudioSerializer
 from rest_framework.permissions import AllowAny, OperandHolder
+
+def get_random_pics(serializer):
+    for i in range(len(serializer.data)):
+        serializer.data[i]["poster"] = Random().choice(
+            ["/media/media/music1.jfif",
+            "/media/media/music2.jfif",
+            "/media/media/music3.png",
+            "/media/media/music4.png",
+            "/media/media/music5.jfif",
+            "/media/media/music6.jfif",
+            "/media/media/music7.jfif",
+            "/media/media/music8.jfif",
+            "/media/media/music9.jfif",])
 
 # Create your views here.
 class PostPodcastView(APIView):
@@ -72,15 +86,15 @@ class PodcastsView(APIView):
     def get(self, request,channel_id):
         audios = Audio.objects.filter(channel_id=channel_id)
         serializer = AudioSerializer(audios, many=True)
-
+        get_random_pics(serializer)
         return Response(serializer.data)
 
 
 class GetRecentlyView(APIView):
     def get(self,request):
-        audio = Audio.objects.all()[:4]
-
+        audio = Random().choices(Audio.objects.all(), k=4)
+        
         serializer = AudioSerializer(audio, many=True)
-
+        get_random_pics(serializer)
         return Response(serializer.data)
 

@@ -1,3 +1,4 @@
+from cgi import print_form
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -28,6 +29,7 @@ class ChannelViewSet(ModelViewSet):
 
         result = Channel.objects.filter(user_id=owner)
         serializer = ChannelSerializer(result, many=True)
+        print(len(serializer.data))
         return Response(serializer.data)
     
 
