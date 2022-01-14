@@ -14,48 +14,7 @@ from abc import ABC, abstractmethod
 
 PICKLE_FILE_PATH = "recommender.model"
 
-class Recommender:
-    def __init__(self):
-        try: 
-            with open(PICKLE_FILE_PATH, "rb") as f:
-                self.model, self.time, self.trainer = pickle.load(f)
-        except Exception:
-            self.model = self.time = None
-        self.get_model()
-    
-    def get_model(self):
-        if self.model == None or time.time() - self.time > 3600 * 2:
-            self.trainer = Trainer()
-            self.model = self.trainer.train_model(RecommenderModelTraining())
-        return self.model
-    def get_dataset(self):
-        if self.model == None:
-            self.get_model()
-        return self.trainer.dataset
-    def get_data(self):
-        if self.model == None:
-            self.get_model()
-        return self.trainer.data
 
-    def recommend(self, user_id):
-        self.get_model()
-        n_items = self.model.get_item_representations().shape()
-        scores = self.model.predict(user_id, np.arange(n_items))
-        data = self.get_data()
-        return data['podcast_id'][np.argsort(-scores)][:6]
-        
-        
-    def rating_added(self, user, item, rating):
-        dataset = self.get_dataset()
-        dataset.fit_partial(users = [user], items=[item])
-        new_interactions, new_weights = dataset.build_interactions((user, item, rating))
-        model = self.get_model()
-        model.fit_partial(new_interactions)
-        
-        
-
-    def performance_check(self):
-        self.trainer.train_model(AccuracyTestModelTraining())
 
 
 class TrainingStrategy(ABC):
@@ -96,31 +55,82 @@ class AccuracyTestModelTraining:
         pass
 
 class Trainer:
+    def __init__(self):
+        self.dataset = Dataset()
     def get_data(self):
-        conn = sqlite3.connect("./database.sqlite")
-        data = pd.read_sql("""SELECT rating, author_id, created_at, podcasts.podcast_id, podcasts.title 
-                                FROM podcasts 
-                                INNER JOIN reviews ON reviews.podcast_id = podcasts.podcast_id""", 
+        from pathlib import Path
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        conn_string = str(BASE_DIR) + '/db.sqlite3'
+        print(f'{conn_string=}')
+        conn = sqlite3.connect(conn_string)
+        data = pd.read_sql("""SELECT rating, ratings_rating.user_id_id as author_id, channel_id_id as podcast_id, subscriber
+                                FROM ratings_rating 
+                                INNER JOIN channels_channel on ratings_rating.channel_id_id = channels_channel.id
+                            """, 
                         conn)
-        category_data = pd.read_sql('''
-                                    SELECT podcast_id, category FROM categories
-                                    ''', conn)
-        category_data = category_data.groupby('podcast_id')['category'].apply(', '.join).reset_index()
-        data = pd.merge(data, category_data, on='podcast_id', how='left')
+        print(data)
         conn.close()
         return data
 
     def train_model(self, trainer: TrainingStrategy):
         self.data = self.get_data()
-        self.dataset = Dataset()
         self.dataset.fit(self.data['author_id'], self.data['podcast_id'])
         self.dataset.fit_partial(items=self.data['podcast_id'],
-                    item_features=self.data['category'])
+                    item_features=self.data['subscriber'])
         self.num_users, self.num_items = self.dataset.interactions_shape()
-        (interactions, _) = self.dataset.build_interactions(zip(self.data['author_id'], self.data['podcast_id'], self.data['rating']-3))
-        item_features = self.dataset.build_item_features(map(lambda x: (x[0][1], x[1][1].split(', ')), 
-                                                    zip(self.data['podcast_id'].items(), self.data['category'].items())))
+        (interactions, _) = self.dataset.build_interactions(zip(self.data['author_id'], self.data['podcast_id'], self.data['rating']))
+        item_features = self.dataset.build_item_features(map(lambda x: (x[0][1], [x[1]]), 
+                                                    zip(self.data['podcast_id'].items(), self.data['subscriber'])))
 
         trainer.fit_model(self.dataset, interactions, item_features)
         trainer.post_process(self)
         return trainer.model
+
+
+class Recommender:
+    def __init__(self):
+        # try: 
+        #     with open(PICKLE_FILE_PATH, "rb") as f:
+        #         self.model, self.time, self.trainer = pickle.load(f)
+        # except Exception:
+        #     self.model = self.time = None
+        self.model = self.time = None
+        self.get_model()
+    
+    def get_model(self):
+        if self.model == None or time.time() - self.time > 3600 * 2:
+            self.trainer = Trainer()
+            self.model = self.trainer.train_model(RecommenderModelTraining())
+        return self.model
+    def get_dataset(self):
+        if self.model == None:
+            self.get_model()
+        return self.trainer.dataset
+    def get_data(self):
+        if self.model == None:
+            self.get_model()
+        return self.trainer.data
+
+    def recommend(self, user_id):
+        dataset = self.get_dataset()
+        n_items = len(self.model.get_item_representations())
+        dataset
+        scores = self.model.predict(0, np.arange(n_items))
+        data = self.get_data()
+        return data['podcast_id'][np.argsort(-scores)][:6]
+        
+        
+    def rating_added(self, user, item, rating):
+        dataset = self.get_dataset()
+        dataset.fit_partial(users = [user], items=[item])
+        new_interactions, new_weights = dataset.build_interactions((user, item, rating))
+        model = self.get_model()
+        model.fit_partial(new_interactions)
+        
+        
+
+    def performance_check(self):
+        self.trainer.train_model(AccuracyTestModelTraining())
+
+class RecommenderFactory:
+    recommender = Recommender()

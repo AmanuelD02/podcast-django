@@ -5,6 +5,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework import filters
 
+from recommendations.recommend import RecommenderFactory
+
 
 
 from .models import Channel, Subscribe
@@ -35,7 +37,17 @@ class ChannelViewSet(ModelViewSet):
 
     @action(detail= False, methods=['get'])
     def top_rated(self, request):
-        channels = Channel.objects.all().order_by('rating')[:10]
+        recommender = RecommenderFactory().recommender
+        channel_ids = list(recommender.recommend(1))
+        channels = Channel.objects.filter(id__in=channel_ids)
+
+        serializer = ChannelSerializer(channels, many=True)
+
+        return Response(serializer.data)
+
+    @action(detail= False, methods=['get'])
+    def all_channels(self, request):
+        channels = Channel.objects.all()
 
         serializer = ChannelSerializer(channels, many=True)
 
