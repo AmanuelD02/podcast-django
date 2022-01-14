@@ -70,9 +70,17 @@ class DownloadPodcastView(APIView):
 
 class PodcastsView(APIView):
     def get(self, request,channel_id):
-        audios = Audio.objects(channel_id=channel_id)
+        audios = Audio.objects.filter(channel_id=channel_id)
         serializer = AudioSerializer(audios, many=True)
 
         return Response(serializer.data)
 
+
+class GetRecentlyView(APIView):
+    def get(self,request):
+        audio = Audio.objects.all()[:4]
+
+        serializer = AudioSerializer(audio, many=True)
+
+        return Response(serializer.data)
 

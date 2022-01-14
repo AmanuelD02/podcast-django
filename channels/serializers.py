@@ -16,8 +16,8 @@ class ChannelSerializer(serializers.ModelSerializer):
         podcasts = Audio.objects.filter(channel_id=channel_id)
         serializer = AudioSerializer(podcasts, many=True)
         audios = serializer.data
-
-        representation['podcasts'] = audios
+        representation['ImageUrl'] = representation['profile_pic']
+        representation['podcasts'] = []
 
         return representation
 

@@ -17,6 +17,7 @@ class AudioSerializer(serializers.ModelSerializer):
         representation['numberOfListeners'] =  random.randint(0,10)
         representation['url'] = representation['path']
         representation['description'] = representation['Description']
+        representation['name'] = representation['title']
 
         # print(instance.channel_id.id)
         channelId = instance.channel_id.id
